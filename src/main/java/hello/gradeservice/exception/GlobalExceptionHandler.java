@@ -1,18 +1,15 @@
 package hello.gradeservice.exception;
 
 import hello.gradeservice.model.ApiResponse;
-import hello.gradeservice.model.Status;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(CustomException.class)
-    @ResponseBody
-    public ApiResponse<Object> handlerCustomException(CustomException ex) {
-        Status status = new Status(ex.getCode(), ex.getMessage());
-        return new ApiResponse<>(status, ex.getData());
+    public ApiResponse customExceptionHandler(CustomException customException, HttpServletResponse response) {
+        response.setStatus(customException.getErrorCode().getHttpStatus().value());
+        return new ApiResponse(customException.getErrorCode().getCode(), customException.getMessage(), customException.getData());
     }
 }

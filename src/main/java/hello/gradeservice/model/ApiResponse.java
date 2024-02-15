@@ -1,39 +1,50 @@
 package hello.gradeservice.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
 public class ApiResponse<T> {
 
-    private Status status; // 코드, 메시지
-    private T data;
-    private MetaData metaData;
+    private Status status;
 
-    public ApiResponse() {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Metadata metadata;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<T> results;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private Object data;
+
+    // 정상 응답
+    public ApiResponse(List<T> results) {
+        this.status = new Status(ErrorCode.OK.getCode(), ErrorCode.OK.getMessage());
+        this.results = results;
+        this.metadata = new Metadata(results.size());
     }
 
-    public ApiResponse(Status status, MetaData metaData, T data) {
-        this.status = status;
-        this.metaData = metaData;
+    // 에러 응답
+    public ApiResponse(int code, String message, Object data) {
+        this.status = new Status(code, message);
         this.data = data;
     }
 
-    public ApiResponse(Status status, T data) {
-        this.status = status;
-        this.data = data;
+    @Getter
+    @AllArgsConstructor
+    private static class Status {
+        private int code;
+        private String message;
     }
 
-    // 성공 응답 생성 메소드
-    public static <T> ApiResponse<T> success(int code, String message, MetaData metaData, T data) {
-        Status status = new Status(code, message);
-        return new ApiResponse<>(status, metaData, data);
-    }
-
-    // 실패 응답 생성 메소드
-    public static <T> ApiResponse<T> failure(int code, String errorMessage, T data) {
-        Status status = new Status(code, errorMessage);
-        return new ApiResponse<>(status, data);
+    @Getter
+    @AllArgsConstructor
+    private static class Metadata {
+        private int resultCount = 0;
     }
 }

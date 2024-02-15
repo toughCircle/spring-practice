@@ -1,4 +1,4 @@
-package hello.gradeservice.model;
+package hello.gradeservice.exception;
 
 import lombok.Getter;
 import lombok.Setter;

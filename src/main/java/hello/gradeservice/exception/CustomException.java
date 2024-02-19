@@ -12,10 +12,10 @@ public class CustomException extends RuntimeException{
     @Getter
     private final ErrorCode errorCode;
 
-    private String message;
+    private final String message;
 
     @Getter
-    private Map.Entry<String, Object> data;
+    private final Map.Entry<String, Object> data;
 
     public CustomException(ErrorCode errorCode, String message, Object data) {
         this.errorCode = errorCode;

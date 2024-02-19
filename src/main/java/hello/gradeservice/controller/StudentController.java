@@ -4,6 +4,7 @@ import hello.gradeservice.exception.CustomException;
 import hello.gradeservice.exception.InputRestriction;
 import hello.gradeservice.model.*;
 import hello.gradeservice.service.StudentService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -24,9 +25,6 @@ public class StudentController {
         @RequestParam("name") String name,
         @RequestParam("grade") int grade
     ) {
-        if (grade >= 6) {
-            throw new CustomException(ErrorCode.BAD_REQUEST, "grade 는 6 이상을 입력할 수 없습니다.", new InputRestriction(6));
-        }
         return makeResponse(studentService.addStudent(name, grade));
     }
 
@@ -46,5 +44,11 @@ public class StudentController {
     @GetMapping("/{score}")
     public ApiResponse getGradeByScore(@PathVariable int grade) {
         return makeResponse(studentService.findByGrade(grade));
+    }
+
+    @ExceptionHandler(CustomException.class)
+    public ApiResponse customExceptionHandler(CustomException customException, HttpServletResponse response) {
+        response.setStatus(customException.getErrorCode().getHttpStatus().value());
+        return new ApiResponse(customException.getErrorCode().getCode(), customException.getMessage(), customException.getData());
     }
 }

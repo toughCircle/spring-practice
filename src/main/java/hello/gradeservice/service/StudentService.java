@@ -1,5 +1,8 @@
 package hello.gradeservice.service;
 
+import hello.gradeservice.exception.CustomException;
+import hello.gradeservice.exception.InputRestriction;
+import hello.gradeservice.model.ErrorCode;
 import hello.gradeservice.model.Student;
 import hello.gradeservice.repository.StudentRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,10 @@ public class StudentService {
     private final StudentRepository studentRepository;
 
     public Student addStudent(String name, int grade) {
+
+        if (grade >= 6) {
+            throw new CustomException(ErrorCode.BAD_REQUEST, "grade 는 6 이상을 입력할 수 없습니다.", new InputRestriction(6));
+        }
         Student student = new Student(name, grade);
         studentRepository.add(student);
 
